@@ -1,0 +1,93 @@
+#include <iostream>
+//#include <stdio.h>
+#include <fstream>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/ioctl.h>
+#include <linux/i2c.h>
+#include <linux/i2c-dev.h>
+
+
+int file_i2c;
+int length;
+uint8_t buffer[3] = {0};
+
+int timingLoopFreq = 500;
+int timingLoopMicroSeconds = 1000000 / timingLoopFreq;
+uint8_t base_addr = 0x20;
+
+using namespace std;
+
+int main(int argc, char **argv)
+{
+    printf("Hello World!\n");
+
+    char *filename = (char*)"/dev/i2c-1";
+    if((file_i2c = open(filename, O_RDWR))< 0){
+         // ERROR handling_ you can check errno to see what went wrong;
+        cout << "failed to open the i2c bus" << endl;
+	return 0;
+    }
+
+
+while (1){
+    if(ioctl(file_i2c, I2C_SLAVE, base_addr) < 0){
+	cout << "Failed to aquire bus access and/or talk to slave" << endl;
+    }
+
+
+
+    uint8_t reg = 0x00;
+    uint8_t byte1 = 0x00;
+    uint8_t byte2 = 0x00;
+    // turn display on
+    byte1 = 0x00;
+    byte2=0x00;
+    length = 3; // expected length?
+
+    buffer[0] = reg;
+    buffer[1] = byte1;
+    buffer[2] = byte2;
+    if(write(file_i2c, buffer, length) != length){
+	cout << "failed to write to i2c bus" << endl; 
+    }
+
+   // write data?
+   reg = 0x02;
+   byte1 = 0x65;
+   byte2 = 0x65;
+
+   buffer[0] = reg;
+   buffer[1] = byte1;
+   buffer[2] = byte2;
+   if(write(file_i2c, buffer, length) != length){
+       cout << "failed to write data to i2c bus" << endl;
+   }
+   
+
+
+
+
+
+
+/*
+
+    // ------ write bytes to display ------
+    buffer [0] = 4;
+    buffer [1] = 0;
+    length = 2;
+    if (write(file_i2c, buffer, length) != length ){
+        cout << "failed to write to the i2c bus" << endl;
+    } else {
+        length = 1;
+	if(read(file_i2c, buffer, length) != length){
+	    cout << "failed to read from the i2c bus" << endl;
+	} else  {
+	cout << "Data read:" << buffer[0] << endl;
+	}
+    }
+*/
+}
+
+    return 0;
+}
