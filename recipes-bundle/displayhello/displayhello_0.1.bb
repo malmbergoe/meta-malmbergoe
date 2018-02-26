@@ -14,7 +14,7 @@ SRC_URI = "git://git@github.com/malmbergoe/DisplayHelloWorld.git;protocol=ssh"
 S = "${WORKDIR}"
 
 do_compile() {
-	     ${CXX} ${LDFLAGS} displayHello.cpp -o helloworld_display
+	     ${CXX} -std=c++11 ${LDFLAGS} git/displayHello.cpp -o helloworld_display
 }
 
 do_install() {
